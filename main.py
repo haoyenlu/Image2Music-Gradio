@@ -101,4 +101,4 @@ def musicgen_inference(prompt, num_token):
 app = gr.mount_gradio_app(app,demo,path="/")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=os.environ['EC2_PORT'])
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ['EC2_PORT']))
