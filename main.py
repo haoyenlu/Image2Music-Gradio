@@ -27,15 +27,15 @@ app.mount("/images",StaticFiles(directory=image_dir),name="images")
 
 
 
-with gr.Blocks().queue(default_concurrency_limit=10) as demo:
+with gr.Blocks(theme=gr.themes.Soft()).queue(default_concurrency_limit=10) as demo:
     
     image_url = gr.State("")
 
     gr.Markdown(
         """
         # Tiktok-techJam Challenge: Image-to-Music
-        ---
         Upload an image from your device or enter an URL of an image and you will get your custom music based on the image!!!
+        --- 
         """
     )
 
