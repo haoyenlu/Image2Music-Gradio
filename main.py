@@ -31,6 +31,14 @@ with gr.Blocks().queue(default_concurrency_limit=10) as demo:
     
     image_url = gr.State("")
 
+    gr.Markdown(
+        """
+        # Tiktok-techJam Challenge: Image-to-Music
+        ---
+        Upload an image from your device or enter an URL of an image and you will get your custom music based on the image!!!
+        """
+    )
+
     with gr.Row() as row:
         with gr.Column() as col1:
 
@@ -46,7 +54,7 @@ with gr.Blocks().queue(default_concurrency_limit=10) as demo:
                     image_url_submit_button = gr.Button("Confirm")
 
             with gr.Tab("Setting"):
-                image_prompt = gr.Text(label="Prompt",value="Describe the music that better suits this picture.")
+                image_prompt = gr.Text(label="Prompt",value="Describe the music that better suits this picture in a sentence.")
                 with gr.Row():
                     llava_num_token = gr.Slider(minimum=10,maximum=50,step=1,label="Prompt Length",value=30)
                     musicgen_num_token = gr.Slider(minimum=100,maximum=1000,step=10,label="Music Length",value=500)
