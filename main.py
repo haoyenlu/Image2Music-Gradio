@@ -34,9 +34,7 @@ with gr.Blocks(theme=gr.themes.Soft()).queue(default_concurrency_limit=10) as de
     gr.Markdown(
         """
         # Tiktok-techJam Challenge: Image-to-Music
-        Upload an image from your device or enter an URL of an image and you will get your custom music based on the image!!!
-        --- 
-        
+        #### Upload an image from your device or enter an URL of an image and you will get your custom music based on the image!!!
         """
     )
 
