@@ -9,6 +9,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+import threading
 
 # FastAPI APP
 app = FastAPI()
@@ -25,13 +26,21 @@ image_dir.mkdir(parents=True,exist_ok=True)
 app.mount("/images",StaticFiles(directory=image_dir),name="images")
 
 
+
 with gr.Blocks().queue(default_concurrency_limit=10) as demo:
+    
+    use_upload_image = gr.State(True)
+
     with gr.Row() as row:
         with gr.Column() as col1:
-            with gr.Tab("Upload Image"):
+
+            with gr.Tab("Upload Image") as tab1:
+                tab1.select(fn=lambda x: True,inputs=[use_upload_image],outputs=[use_upload_image])
                 input_image = gr.Image(label="Upload Image",type='filepath')
                 image_submit_button = gr.Button("Confirm")
-            with gr.Tab("Upload URL"):
+
+            with gr.Tab("Upload URL") as tab2:
+                tab2.select(fn=lambda x: False,inputs=[use_upload_image],outputs=[use_upload_image])
                 input_image_url = gr.Text(label="Upload Image URL")
                 preview_image_box = gr.Image(visible=False,type='pil')
                 with gr.Row():
@@ -54,14 +63,19 @@ with gr.Blocks().queue(default_concurrency_limit=10) as demo:
 
 
 
+
     @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_genre],outputs=[output_text,audio,generate_new_music_button])
-    def save_image_to_folder(input_image,image_prompt,llava_num_token,musicgen_num_token,music_genre):
+    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_genre):
+        if input_image is None:
+            gr.Error('Please upload image first!')
+
+        # Load and Save Image to static folder
         image_name = Path(input_image).name
         image = Image.open(input_image)
         image.save(os.path.join(image_dir,image_name))
-
+        # Construct image url
         url = f"http://{os.environ['EC2_URL']}:{os.environ['EC2_PORT']}/images/{image_name}"
-        return submit(url,image_prompt,llava_num_token,musicgen_num_token,music_genre)
+        return inference(url,image_prompt,llava_num_token,musicgen_num_token,music_genre)
 
 
     @image_url_preview_button.click(inputs=[input_image_url],outputs=[preview_image_box])
@@ -69,16 +83,25 @@ with gr.Blocks().queue(default_concurrency_limit=10) as demo:
         image = Image.open(requests.get(url,stream=True).raw)
         return gr.Image(visible=True,value=image,label="Preview",container=True)
     
-    def submit(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre):
+    def inference(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre):
         llava_result = llava_inference(input_image_url,image_prompt,llava_num_token)
         musicgen_result = musicgen_inference(llava_result + music_genre,musicgen_num_token)
         generate_new_music_button = gr.Button("Generate New Song",visible=True)
         return llava_result, (int(musicgen_result['sample_rate']), np.array(musicgen_result['audio'][0]).astype(np.float32)) , generate_new_music_button
 
-    image_url_submit_button.click(submit,inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre],outputs=[output_text,audio,generate_new_music_button])
-    
-    generate_new_music_button.click(submit,inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre],outputs=[output_text,audio,generate_new_music_button])
+    @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre],outputs=[output_text,audio,generate_new_music_button])
+    def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre):
+        if input_image_url == "":
+            gr.Error("Please Enter the URL of the image!")
 
+        return inference(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre)
+
+    @generate_new_music_button.click(inputs=[use_upload_image,input_image,input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre],outputs=[output_text,audio,generate_new_music_button])
+    def handle_generate_new_song(use_upload_image,input_image,input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre):
+        if use_upload_image:
+            return handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_genre)
+        else:
+            return handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre)
 
 
 def llava_inference(image_url,image_prompt,num_token):
@@ -101,4 +124,7 @@ def musicgen_inference(prompt, num_token):
 app = gr.mount_gradio_app(app,demo,path="/")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=int(os.environ['EC2_PORT']))
+    config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['EC2_PORT']))
+    server = uvicorn.Server(config=config)
+    thread = threading.Thread(target=server.run)
+    thread.start()
