@@ -27,7 +27,7 @@ app.mount("/images",StaticFiles(directory=image_dir),name="images")
 
 
 
-with gr.Blocks(theme=gr.themes.Soft()).queue(default_concurrency_limit=10) as demo:
+with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
     image_url = gr.State("")
 
