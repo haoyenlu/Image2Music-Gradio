@@ -61,7 +61,7 @@ with gr.Blocks().queue(default_concurrency_limit=10) as demo:
         image.save(os.path.join(image_dir,image_name))
 
         url = f"http://{os.environ['EC2_URL']}:{os.environ['EC2_PORT']}/images/{image_name}"
-        return submit(url,image_prompt,image_prompt,llava_num_token,musicgen_num_token,music_genre)
+        return submit(url,image_prompt,llava_num_token,musicgen_num_token,music_genre)
 
 
     @image_url_preview_button.click(inputs=[input_image_url],outputs=[preview_image_box])
