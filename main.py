@@ -6,15 +6,23 @@ from PIL import Image
 import requests
 import os
 from pathlib import Path
+from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+import uvicorn
 
+# FastAPI APP
+app = FastAPI()
+
+# Credential
 load_dotenv()
-
 mb.login()
 
-image_dir = './images'
-os.makedirs(image_dir,exist_ok=True)
+# Static file
+image_dir = Path('./images')
+image_dir.mkdir(parents=True,exist_ok=True)
 
-gr.set_static_paths(paths=[image_dir])
+# Mount FastAPI StaticFiles server
+app.mount("./images",StaticFiles(directory=image_dir),name="images")
 
 
 with gr.Blocks().queue(default_concurrency_limit=10) as demo:
@@ -87,4 +95,7 @@ def musicgen_inference(prompt, num_token):
     return musicgen_response['data']
 
 
-demo.launch(server_name="0.0.0.0")
+app = gr.mount_gradio_app(app,demo,path="/")
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=7860)
