@@ -22,7 +22,7 @@ image_dir = Path('./images')
 image_dir.mkdir(parents=True,exist_ok=True)
 
 # Mount FastAPI StaticFiles server
-app.mount("./images",StaticFiles(directory=image_dir),name="images")
+app.mount("/images",StaticFiles(directory=image_dir),name="images")
 
 
 with gr.Blocks().queue(default_concurrency_limit=10) as demo:
