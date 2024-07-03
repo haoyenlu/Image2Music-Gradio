@@ -36,11 +36,12 @@ with gr.Blocks(theme=gr.themes.Soft()).queue(default_concurrency_limit=10) as de
         # Tiktok-techJam Challenge: Image-to-Music
         Upload an image from your device or enter an URL of an image and you will get your custom music based on the image!!!
         --- 
+        
         """
     )
 
     with gr.Row() as row:
-        with gr.Column() as col1:
+        with gr.Column(variant='compact') as col1:
 
             with gr.Tab("Upload Image") as tab1:
                 input_image = gr.Image(label="Upload Image",type='filepath')
