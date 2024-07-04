@@ -29,6 +29,11 @@ def load_llava_model():
     processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True)
     return model , processor
 
+@cache
+def load_musicgen_model():
+    model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small",local_files_only=True)
+    processor = AutoProcessor.from_pretrained("./musicgen-small",local_files_only=True)
+    return model , processor
 
 
 @app.get('/health')
@@ -38,7 +43,10 @@ def health_check():
 
 @app.post('/musicgen')
 def musicgen(item: MusicGenRequestItem):
-    return item
+    model, processor = load_musicgen_model()
+    inputs = processor(text=[item.prompt],padding=True,return_tensors="pt",)
+    result = model.generate(**inputs, do_sample=True, guidance_scale=3,max_new_tokens=item.max_num_token)
+    return {"audio":result[0].numpy(), "sample_rate":model.config.audio_encoder.sampling_rate}
 
 
 @app.post('/llava')
