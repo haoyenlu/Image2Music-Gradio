@@ -22,17 +22,17 @@ class LlavaRequestItem(BaseModel):
 
 
 
-def musicgen(item: MusicGenRequestItem):
-    inputs = musicgen_processor(text=[item.prompt],padding=True,return_tensors="pt",)
-    result = musicgen_model.generate(**inputs, do_sample=True, guidance_scale=3,max_new_tokens=item.max_num_token)
+def musicgen(prompt, max_num_token=200):
+    inputs = musicgen_processor(text=[prompt],padding=True,return_tensors="pt",)
+    result = musicgen_model.generate(**inputs, do_sample=True, guidance_scale=3,max_new_tokens=max_num_token)
     return {"audio":result[0].numpy(), "sample_rate":musicgen_model.config.audio_encoder.sampling_rate}
 
 
-def llava(item: LlavaRequestItem):
-    image = Image.open(requests.get(item.url,stream=True).raw)
-    full_prompt = f"USER: <image>\\n{item.prompt} ASSISTANT:"
+def llava(url,prompt,max_num_token=20):
+    image = Image.open(requests.get(url,stream=True).raw)
+    full_prompt = f"USER: <image>\\n{prompt} ASSISTANT:"
     inputs = llava_processor(text=full_prompt, images=image, return_tensors="pt")
-    generate_ids = llava_model.generate(**inputs, max_new_tokens=item.max_num_token)
+    generate_ids = llava_model.generate(**inputs, max_new_tokens=max_num_token)
     result = llava_processor.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0].split("ASSISTANT:")[1]
     return result
 
