@@ -21,8 +21,8 @@ app = FastAPI()
 
 llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,device_map="auto")
 llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,device_map="auto")
-musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small",local_files_only=True,device_map="auto")
-musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small",local_files_only=True,device_map="auto")
+musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small")
+musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small")
 
 class MusicGenRequestItem(BaseModel):
     prompt: str
