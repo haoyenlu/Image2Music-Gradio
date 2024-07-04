@@ -87,7 +87,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
         image.save(os.path.join(image_dir,image_name))
 
         # Construct image url
-        image_url = f"http://{os.environ['EC2_URL']}:{os.environ['EC2_PORT']}/images/{image_name}"
+        image_url = f"{os.environ['EC2_URL']}:{os.environ['GRADIO_PORT']}/images/{image_name}"
 
         return inference(image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre)
 
@@ -117,7 +117,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
 
 def llava_inference(image_url,image_prompt,num_token):
-    url = os.environ['INFERENCE_URL'] + "/llava"
+    url = f"{os.environ['EC2_URL']}:{os.environ['MODEL_PORT']}/llava"
     data = {
         "url":image_url,
         "prompt": image_prompt,
@@ -128,7 +128,7 @@ def llava_inference(image_url,image_prompt,num_token):
     
 
 def musicgen_inference(prompt, num_token):
-    url = os.environ['INFERENCE_URL'] + "/musicgen"
+    url = f"{os.environ['EC2_URL']}:{os.environ['MODEL_PORT']}/musicgen"
     data = {
         "prompt": prompt,
         "max_num_token": num_token
@@ -141,9 +141,9 @@ app = gr.mount_gradio_app(app,demo,path="/")
 
 
 if __name__ == "__main__":
-    # config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
-    config = uvicorn.Config(app=app)
+    config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
+    # config = uvicorn.Config(app=app)
     server = uvicorn.Server(config=config)
-    server.run()
-    # thread = threading.Thread(target=server.run)
-    # thread.start()
+    # server.run()
+    thread = threading.Thread(target=server.run)
+    thread.start()
