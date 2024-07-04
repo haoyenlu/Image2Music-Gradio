@@ -11,18 +11,18 @@ import os
 import threading
 from dotenv import load_dotenv
 import logging
+import accelerate
+import bitsandbytes
+
+
 load_dotenv()
 
 app = FastAPI()
-logger  = logging.getLogger('uvicorn')
 
-
-logger.info("Start Loading Models")
 llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
 llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
 musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small",local_files_only=True)
 musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small",local_files_only=True)
-logger.info("Complete Loading Models")
 
 class MusicGenRequestItem(BaseModel):
     prompt: str
