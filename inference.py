@@ -1,4 +1,3 @@
-from pydantic import BaseModel
 from PIL import Image
 import requests
 from transformers import AutoProcessor, MusicgenForConditionalGeneration, LlavaForConditionalGeneration, BitsAndBytesConfig
@@ -11,17 +10,6 @@ llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_f
 llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,device_map="auto")
 musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small").to(device)
 musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small")
-
-
-
-class MusicGenRequestItem(BaseModel):
-    prompt: str
-    max_num_token: int 
-
-class LlavaRequestItem(BaseModel):
-    url: str
-    prompt: str
-    max_num_token: int 
 
 
 
