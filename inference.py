@@ -5,24 +5,28 @@ from pydantic import BaseModel
 import uvicorn
 from PIL import Image
 import requests
-from transformers import AutoProcessor, MusicgenForConditionalGeneration, LlavaForConditionalGeneration
-from functools import cache
+from transformers import AutoProcessor, MusicgenForConditionalGeneration, LlavaForConditionalGeneration, BitsAndBytesConfig
 import os
 import threading
 from dotenv import load_dotenv
 import logging
 import accelerate
 import bitsandbytes
-
+import torch
 
 load_dotenv()
 
 app = FastAPI()
 
-llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
-llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
-musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small",local_files_only=True)
-musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small",local_files_only=True)
+quantization_config = BitsAndBytesConfig(  
+    load_in_4bit=True,
+    bnb_4bit_compute_dtype=torch.float16
+)
+
+llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,quantization_config=quantization_config,device_map="auto")
+llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,device_map="auto")
+musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small",local_files_only=True,device_map="auto")
+musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small",local_files_only=True,device_map="auto")
 
 class MusicGenRequestItem(BaseModel):
     prompt: str
