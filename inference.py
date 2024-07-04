@@ -6,8 +6,8 @@ import torch
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,device_map="auto").to(device)
-llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,device_map="auto")
+llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True).to(device)
+llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
 musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small").to(device)
 musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small")
 
