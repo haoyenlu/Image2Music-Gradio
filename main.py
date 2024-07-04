@@ -143,6 +143,11 @@ def musicgen_inference(prompt, num_token):
 app = gr.mount_gradio_app(app,demo,path="/")
 
 
+@app.get('/')
+def health_check():
+    return {"message":"Connect successfully!"}
+
+
 if __name__ == "__main__":
     config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
     # config = uvicorn.Config(app=app)
