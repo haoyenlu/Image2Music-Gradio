@@ -14,12 +14,12 @@ app = FastAPI()
 
 class MusicGenRequestItem(BaseModel):
     prompt: str
-    max_num_token: int | None = None
+    max_num_token: int 
 
 class LlavaRequestItem(BaseModel):
     url: str
     prompt: str
-    max_num_token: int | None = None
+    max_num_token: int 
 
 @cache
 def load_llava_model():
