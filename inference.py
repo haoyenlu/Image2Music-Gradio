@@ -19,7 +19,7 @@ load_dotenv()
 app = FastAPI()
 
 quantization_config = BitsAndBytesConfig(  
-    load_in_4bit=True,
+    load_in_4bit=False,
     bnb_4bit_compute_dtype=torch.float16
 )
 
