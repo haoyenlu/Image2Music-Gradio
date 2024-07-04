@@ -25,8 +25,8 @@ class LlavaRequestItem(BaseModel):
 
 @cache
 def load_llava_model():
-    model = LlavaForConditionalGeneration.from_pretrained("llava-hf/llava-1.5-7b-hf")
-    processor = AutoProcessor.from_pretrained("llava-hf/llava-1.5-7b-hf")
+    model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True)
+    processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True)
     return model , processor
 
 
