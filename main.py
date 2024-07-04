@@ -1,4 +1,3 @@
-import modelbit as mb
 import numpy as np
 import gradio as gr
 from dotenv import load_dotenv
@@ -11,13 +10,13 @@ from fastapi.staticfiles import StaticFiles
 import uvicorn
 import threading
 import yaml
+import json
 
 # FastAPI APP
 app = FastAPI()
 
 # Credential
 load_dotenv()
-mb.login()
 
 # Static file
 image_dir = Path('./images')
@@ -118,29 +117,33 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
 
 def llava_inference(image_url,image_prompt,num_token):
-    llava_response = mb.get_inference(
-        workspace="haoenlu07",
-        deployment="prompt_llava",
-        data=[image_url, image_prompt, num_token]
-    )
-    return llava_response['data']
+    url = os.environ['INFERENCE_URL'] + "/llava"
+    data = {
+        "url":image_url,
+        "prompt": image_prompt,
+        "max_num_token": num_token
+    }
+    response = requests.post(url,json=data)
+    return json.loads(response.text)
+    
 
 def musicgen_inference(prompt, num_token):
-    musicgen_response = mb.get_inference(
-        workspace="haoenlu07",
-        deployment="musicgen",
-        data=[prompt,num_token]
-    )
-    return musicgen_response['data']
+    url = os.environ['INFERENCE_URL'] + "/musicgen"
+    data = {
+        "prompt": prompt,
+        "max_num_token": num_token
+    }
+    response = requests.post(url,json=data)
+    return json.loads(response.text)
 
 
 app = gr.mount_gradio_app(app,demo,path="/")
 
 
 if __name__ == "__main__":
-    config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['EC2_PORT']))
-    # config = uvicorn.Config(app=app)
+    # config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
+    config = uvicorn.Config(app=app)
     server = uvicorn.Server(config=config)
-    # server.run()
-    thread = threading.Thread(target=server.run)
-    thread.start()
+    server.run()
+    # thread = threading.Thread(target=server.run)
+    # thread.start()
