@@ -48,7 +48,7 @@ def musicgen(item: MusicGenRequestItem):
     model, processor = load_musicgen_model()
     inputs = processor(text=[item.prompt],padding=True,return_tensors="pt",)
     result = model.generate(**inputs, do_sample=True, guidance_scale=3,max_new_tokens=item.max_num_token)
-    return JSONResponse(content={"audio":result[0].numpy(), "sample_rate":model.config.audio_encoder.sampling_rate})
+    return JSONResponse(content={"audio":result[0], "sample_rate":model.config.audio_encoder.sampling_rate})
 
 
 @app.post('/llava')
