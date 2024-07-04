@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 import threading
+import yaml
 
 # FastAPI APP
 app = FastAPI()
@@ -22,10 +23,13 @@ mb.login()
 image_dir = Path('./images')
 image_dir.mkdir(parents=True,exist_ok=True)
 
+setting_file = './setting.yaml'
+
 # Mount FastAPI StaticFiles server
 app.mount("/images",StaticFiles(directory=image_dir),name="images")
 
-
+with open(setting_file,'r') as file:
+    setting = yaml.safe_load(file)
 
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
@@ -58,14 +62,17 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
                 with gr.Row():
                     llava_num_token = gr.Slider(minimum=10,maximum=50,step=1,label="Prompt Length",value=30)
                     musicgen_num_token = gr.Slider(minimum=100,maximum=1000,step=10,label="Music Length",value=500)
-                music_genre = gr.Text(label="Music Genre")
+                with gr.Row():
+                    genre_dropdown = gr.Dropdown(choices=setting['Genre'],max_choices=1,label="Genre")
+                    mood_dropdown = gr.Dropdown(choices=setting['Mood'],max_choices=1,label="Mood")
+
+                music_genre = gr.Text(label="Custom Music Specification")
 
 
         with gr.Column() as col2:
             output_text = gr.Textbox()
             audio = gr.Audio(label="result",type="numpy")
             generate_new_music_button = gr.Button("Generate New Song",visible=False)
-
 
 
 
@@ -129,8 +136,11 @@ def musicgen_inference(prompt, num_token):
 
 app = gr.mount_gradio_app(app,demo,path="/")
 
+
 if __name__ == "__main__":
     config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['EC2_PORT']))
+    # config = uvicorn.Config(app=app)
     server = uvicorn.Server(config=config)
+    # server.run()
     thread = threading.Thread(target=server.run)
     thread.start()
