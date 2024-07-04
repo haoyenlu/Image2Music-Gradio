@@ -141,9 +141,9 @@ app = gr.mount_gradio_app(app,demo,path="/")
 
 
 if __name__ == "__main__":
-    # config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
-    config = uvicorn.Config(app=app)
+    config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
+    # config = uvicorn.Config(app=app)
     server = uvicorn.Server(config=config)
-    server.run()
-    # thread = threading.Thread(target=server.run)
-    # thread.start()
+    # server.run()
+    thread = threading.Thread(target=server.run)
+    thread.start()
