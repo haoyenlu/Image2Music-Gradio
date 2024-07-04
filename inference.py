@@ -44,7 +44,7 @@ def health_check():
 def musicgen(item: MusicGenRequestItem):
     inputs = musicgen_processor(text=[item.prompt],padding=True,return_tensors="pt",)
     result = musicgen_model.generate(**inputs, do_sample=True, guidance_scale=3,max_new_tokens=item.max_num_token)
-    return JSONResponse(content={"audio":result[0].numpy().tolist(), "sample_rate":model.config.audio_encoder.sampling_rate})
+    return JSONResponse(content={"audio":result[0].numpy().tolist(), "sample_rate":musicgen_model.config.audio_encoder.sampling_rate})
 
 
 @app.post('/llava')
