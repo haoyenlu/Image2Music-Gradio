@@ -18,8 +18,8 @@ logger  = logging.getLogger('uvicorn')
 
 
 logger.info("Start Loading Models")
-llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True)
-llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True)
+llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
+llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
 musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small",local_files_only=True)
 musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small",local_files_only=True)
 logger.info("Complete Loading Models")
