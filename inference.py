@@ -7,7 +7,9 @@ from transformers import AutoProcessor, MusicgenForConditionalGeneration, LlavaF
 from functools import cache
 import os
 import threading
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = FastAPI()
 
