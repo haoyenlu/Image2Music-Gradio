@@ -144,9 +144,9 @@ def musicgen_inference(prompt, num_token):
 app = gr.mount_gradio_app(app,demo,path="/")
 
 
-@app.get('/health')
-def health_check():
-    return {"message":"Connect successfully!"}
+# @app.get('/health')
+# def health_check():
+#     return {"message":"Connect successfully!"}
 
 
 if __name__ == "__main__":
