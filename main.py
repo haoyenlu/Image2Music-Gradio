@@ -79,7 +79,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
             @gr.render(inputs=[audios],triggers=[audios.change],trigger_mode='once')
             def dynamic_audio_component_render(audios):
-                for i in range(len(num_song)):
+                for i in range(len(audios)):
                     gr.Audio(value=(audios[i]),interactive=False,type="numpy",label=f"sample {i+1}")
                 
 
