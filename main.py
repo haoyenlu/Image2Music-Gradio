@@ -122,7 +122,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
     @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song],
                                    outputs=[image,output_text,audios,generate_new_music_button])
-    def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
+    def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song):
         if input_image_url == "":
             raise gr.Error("Please Enter the URL of the image!")
         
