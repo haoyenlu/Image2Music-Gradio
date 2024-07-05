@@ -162,7 +162,7 @@ def musicgen_inference(prompt, num_token, num_song):
 
 
 
-app = gr.mount_gradio_app(app,demo,'/gradio')
+app = gr.mount_gradio_app(app,demo,'/')
 
 @app.get('/health')
 def health_check():
