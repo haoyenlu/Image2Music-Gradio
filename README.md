@@ -15,7 +15,12 @@ https://github.com/haoyenlu/image-to-music-app/assets/74141558/dafe97e9-3fad-415
 
 It also supports uploading url of the image and previewing the image in the website. The music will generate based on the image of the url.
 
+---
 
+https://github.com/haoyenlu/image-to-music-app/assets/74141558/5a1abf4e-dfc0-4146-ad9f-c003b378cbef
+
+User can also specify the number of songs, the genre of the song, the mood of the song, and some custom specifications of the song.
+Increase the prompt length can get a more accuracte description by the AI for better generation, and user can also specify the length of the song, the length of the song is roughly (Music Length / 50).
 
 ---
 
