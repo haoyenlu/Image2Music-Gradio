@@ -87,7 +87,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
     @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audio_component_list],
                                outputs=[image,output_text,audio_component_list,generate_new_music_button])
-    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,,audio_component_list):
+    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audio_component_list):
         if input_image is None:
             raise gr.Error('Please upload image first!')
 
