@@ -10,6 +10,7 @@ import threading
 import yaml
 import json
 
+
 from inference import Pipeline
 
 # model pipeline
