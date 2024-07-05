@@ -7,7 +7,7 @@ app = fastapi.FastAPI()
 
 @app.get('/health')
 def health_check():
-    return "Hello World!"
+    return {"message":"Hello World!"}
 
 
 
