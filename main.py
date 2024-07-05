@@ -79,8 +79,8 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
             @gr.render(inputs=[num_song,audios],triggers=[audios.change])
             def dynamic_audio_component_render(num_song,audios):
                 for i in range(num_song):
-                    print(audios[i].shape)
-                    temp = gr.Audio(value=(audios[i]),interactive=False,type="numpy")
+                    print(audios[i])
+                    gr.Audio(value=(audios[i]),interactive=False,type="numpy")
                 
 
             generate_new_music_button = gr.Button("Generate New Song",visible=False)
