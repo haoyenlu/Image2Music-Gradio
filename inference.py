@@ -22,8 +22,7 @@ class Pipeline:
         return {"audio":result[0].numpy(), "sample_rate":self.musicgen_model.config.audio_encoder.sampling_rate}
 
 
-    def llava(self,url,prompt,max_num_token=20):
-        image = Image.open(requests.get(url,stream=True).raw)
+    def llava(self,image,prompt,max_num_token=20):
         full_prompt = f"USER: <image>\\n{prompt} ASSISTANT:"
         inputs = self.llava_processor(text=full_prompt, images=image, return_tensors="pt").to(self.device)
         generate_ids = self.llava_model.generate(**inputs, max_new_tokens=max_num_token)
