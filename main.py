@@ -37,7 +37,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
     gr.Markdown(
         """
-        # Tiktok-techJam Challenge: Image-to-Music
+        # Image2Music  :notes:
         #### Upload an image from your device or enter an URL of an image and you will get your custom music based on the image!!!
         ---
         """
@@ -59,7 +59,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
             with gr.Tab("Setting",elem_id="setting"):
                 with gr.Row():
-                    image_prompt = gr.Text(label="Prompt",value="Describe the music in detail that better suits this picture in a sentence.",scale=3)
+                    image_prompt = gr.Text(label="Prompt",value="Describe the music that better suits this picture in a sentence..",scale=3)
                     num_song = gr.Number(value=1,minimum=1,maximum=5,scale=1)
 
                 with gr.Row():
