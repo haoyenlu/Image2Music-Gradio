@@ -8,6 +8,7 @@ import threading
 import yaml
 import json
 import fastapi
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 
@@ -22,7 +23,6 @@ pipeline.load_model()
 load_dotenv()
 
 setting_file = './setting.yaml'
-
 
 with open(setting_file,'r') as file:
     setting = yaml.safe_load(file)
@@ -76,7 +76,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
         with gr.Column() as col2:
             output_text = gr.Textbox()
 
-            @gr.render(inputs=[num_song,audios],triggers=[audios.change])
+            @gr.render(inputs=[num_song,audios],triggers=audios.change,trigger_mode='once')
             def dynamic_audio_component_render(num_song,audios):
                 for i in range(num_song):
                     print(audios[i])
