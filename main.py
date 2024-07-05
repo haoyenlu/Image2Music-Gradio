@@ -111,7 +111,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
         sample_rate =  int(musicgen_result['sample_rate'])
         audios = musicgen_result['audio']
-        for i, component in zip(audio_list):
+        for i, component in enumerate(audio_list):
             component = gr.Audio(value=(sample_rate,np.array(audios[i]).astype(np.float32)),interactive=False,type="numpy")
 
         return image,llava_result, audio_list , generate_new_music_button
