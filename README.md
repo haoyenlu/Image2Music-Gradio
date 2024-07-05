@@ -4,6 +4,11 @@ The UI of this project is built upon [Gradio](https://github.com/gradio-app/grad
 The website is hosted using Vest.Ai GPU server. Try out the demo with this url: [Image2Music](http://91.150.160.38:1632/)
 
 
+## Pipeline
+![Image2Music](https://github.com/haoyenlu/image-to-music-app/assets/74141558/3e2536c2-7ee7-4427-ab53-dfe2e8fef83f)
+First it feeds the image to the Llava model with a prompt that tells the model to generate sentence that describe the image, then the sentence is fed to the Musicgen model to generate the music.
+
+
 ### Demo
 https://github.com/haoyenlu/image-to-music-app/assets/74141558/76f8fecd-1249-453c-b3cf-c8884fb39a1b
 
