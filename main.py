@@ -30,7 +30,6 @@ with open(setting_file,'r') as file:
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
     image = gr.State()
-    audio_component_list = gr.State([])
 
 
     gr.Markdown(
@@ -62,6 +61,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
                     with gr.Column(scale=1):
                         num_song = gr.Number(value=1,minimum=1,maximum=5)
 
+
                 with gr.Row():
                     llava_num_token = gr.Slider(minimum=10,maximum=50,step=1,label="Prompt Length",value=30)
                     musicgen_num_token = gr.Slider(minimum=100,maximum=1000,step=10,label="Music Length",value=500)
@@ -74,16 +74,16 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
         with gr.Column() as col2:
             output_text = gr.Textbox()
-            # audio = gr.Audio(label="result",type="numpy")
-
-            @gr.render(inputs=[num_song,audio_component_list])
-            def render_audio_components(num,audio_component_list):
-                audio_list = []
-                for i in range(num):
-                    audio_list.append(gr.Audio(label=f"sample {i}",type="numpy",interactive=False))
-                audio_component_list = audio_list
+            audio_component_list = []
+            for i in range(setting['Audio']['max_audio']):
+                audio_component_list.append(gr.Audio(visible=False,type="numpy",interactive=False))
 
             generate_new_music_button = gr.Button("Generate New Song",visible=False)
+
+            def on_num_song_change(num):
+                return [gr.Audio(visible=True,type="numpy",interactive=False)] * num + [gr.Audio(visible=False,type="numpy",interactive=False)] * (setting['Audio']['max_audio'] - num)
+            
+            num_song.change(on_num_song_change,num_song,audio_component_list)
 
 
 
@@ -113,8 +113,10 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
         sample_rate =  int(musicgen_result['sample_rate'])
         audios = musicgen_result['audio']
+
+        print(len(audio_list))
         for i in range(num_song):
-            audio_list[i].update(value=(sample_rate,np.array(audios[i,0,:]).astype(np.float32)))
+            audio_list[i] = gr.Audio(value=(sample_rate,np.array(audios[i,0,:]).astype(np.float32)),type="numpy",interactive=False)
 
         return image,llava_result, audio_list , generate_new_music_button
 
