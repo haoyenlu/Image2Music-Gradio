@@ -16,6 +16,7 @@ from inference import Pipeline
 # model pipeline
 app = fastapi.FastAPI()
 pipeline = Pipeline()
+# pipeline.load_model()
 
 # Credential
 load_dotenv()
@@ -29,6 +30,8 @@ with open(setting_file,'r') as file:
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
     image = gr.State()
+    audio_component_list = gr.State([])
+
 
     gr.Markdown(
         """
@@ -53,7 +56,12 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
                     image_url_submit_button = gr.Button("Confirm")
 
             with gr.Tab("Setting"):
-                image_prompt = gr.Text(label="Prompt",value="Describe the music that better suits this picture in a sentence.")
+                with gr.Row():
+                    with gr.Column(scale=4):
+                        image_prompt = gr.Text(label="Prompt",value="Describe the music in detail, including instrument and genre, that better suits this picture in a sentence.")
+                    with gr.Column(scale=1):
+                        num_song = gr.Number(value=1,minimum=1,maximum=5)
+
                 with gr.Row():
                     llava_num_token = gr.Slider(minimum=10,maximum=50,step=1,label="Prompt Length",value=30)
                     musicgen_num_token = gr.Slider(minimum=100,maximum=1000,step=10,label="Music Length",value=500)
@@ -66,19 +74,24 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
         with gr.Column() as col2:
             output_text = gr.Textbox()
-            audio = gr.Audio(label="result",type="numpy")
+            # audio = gr.Audio(label="result",type="numpy")
+
+            @gr.render(inputs=[num_song,audio_component_list])
+            def render_audio_components(num,audio_component_list):
+                for i in range(num):
+                    audio_component_list.append(gr.Audio(label=f"sample {i}",type="numpy",interactive=False))
+
             generate_new_music_button = gr.Button("Generate New Song",visible=False)
 
 
 
-
-    @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown],
-                               outputs=[image,output_text,audio,generate_new_music_button])
-    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
+    @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song],
+                               outputs=[image,output_text,audio_component_list,generate_new_music_button])
+    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song):
         if input_image is None:
             raise gr.Error('Please upload image first!')
 
-        return inference(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown)
+        return inference(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
 
 
     @image_url_preview_button.click(inputs=[input_image_url],outputs=[preview_image_box])
@@ -86,30 +99,37 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
         image = Image.open(requests.get(url,stream=True).raw)
         return gr.Image(visible=True,value=image,label="Preview",container=True)
     
-    def inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description, genre_dropdown, mood_dropdown):
+    def inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description, genre_dropdown, mood_dropdown,num_song):
         llava_result = llava_inference(image,image_prompt,llava_num_token)
 
         genre = "" if genre_dropdown == "None" else genre_dropdown
         mood = mood_dropdown if mood_dropdown != "None" else mood_dropdown
         musicgen_prompt = f"{llava_result},{music_description},{genre},{mood}"
 
-        musicgen_result = musicgen_inference(f"{llava_result},{music_description},{genre_dropdown} in {mood_dropdown} mood", musicgen_num_token)
+        musicgen_result = musicgen_inference(f"{llava_result},{musicgen_prompt}", musicgen_num_token,num_song)
         generate_new_music_button = gr.Button("Generate New Song",visible=True)
-        return image,llava_result, (int(musicgen_result['sample_rate']), np.array(musicgen_result['audio'][0]).astype(np.float32)) , generate_new_music_button
 
-    @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown],
-                                   outputs=[image,output_text,audio,generate_new_music_button])
+        sample_rate =  int(musicgen_result['sample_rate'])
+        audios = musicgen_result['audio']
+        audio_tuple = []
+        for i in range(num_song):
+            audio_tuple.append(sample_rate,np.array(audios[i]).astype(np.float32))
+
+        return image,llava_result, audio_tuple , generate_new_music_button
+
+    @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song],
+                                   outputs=[image,output_text,audio_component_list,generate_new_music_button])
     def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
         if input_image_url == "":
             raise gr.Error("Please Enter the URL of the image!")
         
         image = Image.open(requests.get(input_image_url,stream=True).raw)
-        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown)
+        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
 
-    @generate_new_music_button.click(inputs=[image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown],
-                                     outputs=[image,output_text,audio,generate_new_music_button])
-    def handle_generate_new_song(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
-        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown)
+    @generate_new_music_button.click(inputs=[image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song],
+                                     outputs=[image,output_text,audio_component_list,generate_new_music_button])
+    def handle_generate_new_song(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song):
+        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
     
 
 
@@ -122,12 +142,15 @@ def llava_inference(image,image_prompt,num_token):
     return pipeline.llava(**data)
     
 
-def musicgen_inference(prompt, num_token):
+def musicgen_inference(prompt, num_token, num_song):
     data = {
         "prompt": prompt,
-        "max_num_token": num_token
+        "max_num_token": num_token,
+        "num_song": num_song
     }
     return pipeline.musicgen(**data)
+
+
 
 app = gr.mount_gradio_app(app,demo,'/gradio')
 
@@ -135,8 +158,13 @@ app = gr.mount_gradio_app(app,demo,'/gradio')
 def health_check():
     return {"message":"Connect successfully!"}
 
+
+
 if __name__ == "__main__":
+    
     config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
     server = uvicorn.Server(config)
-    thread = threading.Thread(target=server.run)
-    thread.start()
+    server.run()
+
+    # thread = threading.Thread(target=server.run)
+    # thread.start()

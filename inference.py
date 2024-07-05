@@ -10,14 +10,15 @@ class Pipeline:
     def __init__(self):
         self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
+
+    def load_model(self):
         self.llava_model = LlavaForConditionalGeneration.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
         self.llava_processor = AutoProcessor.from_pretrained("./llava-hf",local_files_only=True,load_in_8bit=True)
         self.musicgen_model = MusicgenForConditionalGeneration.from_pretrained("./musicgen-small").to(self.device)
         self.musicgen_processor = AutoProcessor.from_pretrained("./musicgen-small")
 
-
-    def musicgen(self,prompt, max_num_token=200):
-        inputs = self.musicgen_processor(text=[prompt],padding=True,return_tensors="pt").to(self.device)
+    def musicgen(self,prompt, max_num_token=200,num_song=1):
+        inputs = self.musicgen_processor(text=[prompt] * num_song,padding=True,return_tensors="pt").to(self.device)
         result = self.musicgen_model.generate(**inputs, do_sample=True, guidance_scale=3,max_new_tokens=max_num_token)
         return {"audio":result[0].cpu().numpy(), "sample_rate":self.musicgen_model.config.audio_encoder.sampling_rate}
 
