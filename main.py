@@ -29,6 +29,7 @@ with open(setting_file,'r') as file:
 
 
 def debug_fn():
+    print("Debug")
     gr.Info("Debug Call")
 
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
