@@ -20,7 +20,7 @@ class Pipeline:
     def musicgen(self,prompt, max_num_token=200,num_song=1):
         inputs = self.musicgen_processor(text=[prompt] * num_song,padding=True,return_tensors="pt").to(self.device)
         result = self.musicgen_model.generate(**inputs, do_sample=True, guidance_scale=3,max_new_tokens=max_num_token)
-        return {"audio":result[0].cpu().numpy(), "sample_rate":self.musicgen_model.config.audio_encoder.sampling_rate}
+        return {"audio":result.cpu().numpy(), "sample_rate":self.musicgen_model.config.audio_encoder.sampling_rate}
 
 
     def llava(self,image,prompt,max_num_token=20):
