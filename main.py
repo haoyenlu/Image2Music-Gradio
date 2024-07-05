@@ -87,13 +87,13 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
 
 
-    @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios],
+    @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song],
                                outputs=[image,output_text,audios,generate_new_music_button])
-    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios):
+    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song):
         if input_image is None:
             raise gr.Error('Please upload image first!')
 
-        return inference(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios)
+        return inference(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
 
 
     @image_url_preview_button.click(inputs=[input_image_url],outputs=[preview_image_box])
@@ -120,19 +120,19 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
         return image,llava_result, audio_list , generate_new_music_button
 
-    @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios],
+    @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song],
                                    outputs=[image,output_text,audios,generate_new_music_button])
-    def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,audios):
+    def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
         if input_image_url == "":
             raise gr.Error("Please Enter the URL of the image!")
         
         image = Image.open(requests.get(input_image_url,stream=True).raw)
-        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios)
+        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
 
-    @generate_new_music_button.click(inputs=[image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios],
+    @generate_new_music_button.click(inputs=[image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song],
                                      outputs=[image,output_text,audios,generate_new_music_button])
-    def handle_generate_new_song(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios):
-        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song,audios)
+    def handle_generate_new_song(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song):
+        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
     
 
 
