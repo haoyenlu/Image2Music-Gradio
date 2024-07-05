@@ -1,5 +1,6 @@
 # Tiktok-Techjam Challenge - Image2Music 
-Generative AI is a super strong tool that can generate basically anything. In this project, I utilized existing Gen AI model (Llava and Musicgen) to develop a web application that allow user to get a custom music based on the image. You can hear the picture!!
+Generative AI is a super strong tool that can generate basically anything. In this project, I utilized existing Gen AI model (Llava and Musicgen) to develop a web application that allow user to get a custom music based on the image. You can hear the picture!!:musical_note::musical_note:
+
 The UI of this project is built upon [Gradio](https://github.com/gradio-app/gradio.git), which is an open-source, light-weighted frontend library for quick and fast machine learning model demo.
 The website is hosted using Vest.Ai GPU server. Try out the demo with this url: [Image2Music](http://91.150.160.38:1632/)
 
