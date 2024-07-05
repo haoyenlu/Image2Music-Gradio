@@ -76,7 +76,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
         with gr.Column() as col2:
             output_text = gr.Textbox()
 
-            @gr.render(inputs=[num_song,audios],triggers=audios.change,trigger_mode='once')
+            @gr.render(inputs=[num_song,audios],triggers=[audios.change],trigger_mode='once')
             def dynamic_audio_component_render(num_song,audios):
                 for i in range(num_song):
                     print(audios[i])
