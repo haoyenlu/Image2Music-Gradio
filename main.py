@@ -27,10 +27,15 @@ setting_file = './setting.yaml'
 with open(setting_file,'r') as file:
     setting = yaml.safe_load(file)
 
+
+def debug_fn():
+    gr.Info("Debug Call")
+
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
     image = gr.State()
-    audios = gr.State([])
+    audios = gr.State([]).change(debug_fn,inputs=None,outputs=None)
+
 
 
     gr.Markdown(
