@@ -59,13 +59,14 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
             with gr.Tab("Setting"):
                 with gr.Row():
-                    image_prompt = gr.Text(label="Prompt",value="Describe the music in detail that better suits this picture in a sentence.")
-        
+                    image_prompt = gr.Text(label="Prompt",value="Describe the music in detail that better suits this picture in a sentence.",scale=3)
+                    num_song = gr.Number(value=1,minimum=1,maximum=5,scale=1)
+
                 with gr.Row():
                     llava_num_token = gr.Slider(minimum=10,maximum=50,step=1,label="Prompt Length",value=30)
                     musicgen_num_token = gr.Slider(minimum=100,maximum=1000,step=10,label="Music Length",value=500)
-                    num_song = gr.Number(value=1,minimum=1,maximum=5)
-                    
+
+
                 with gr.Row():
                     genre_dropdown = gr.Dropdown(choices=setting['Genre'],max_choices=1,label="Genre",value="None")
                     mood_dropdown = gr.Dropdown(choices=setting['Mood'],max_choices=1,label="Mood",value="None")
