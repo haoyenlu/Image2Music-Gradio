@@ -35,7 +35,8 @@ def debug_fn():
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
     image = gr.State()
-    audios = gr.State([]).change(debug_fn,inputs=None,outputs=None)
+    audios = gr.State([])
+    audios.change(debug_fn,inputs=None,outputs=None)
 
 
 
