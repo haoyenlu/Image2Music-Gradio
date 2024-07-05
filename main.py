@@ -6,9 +6,7 @@ import requests
 import os
 import threading
 import yaml
-import json
 import fastapi
-from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 
@@ -36,9 +34,6 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
     
     image = gr.State()
     audios = gr.State([])
-    audios.change(debug_fn,inputs=None,outputs=None)
-
-
 
     gr.Markdown(
         """
@@ -64,15 +59,13 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
             with gr.Tab("Setting"):
                 with gr.Row():
-                    with gr.Column(scale=4):
-                        image_prompt = gr.Text(label="Prompt",value="Describe the music in detail, including instrument and genre, that better suits this picture in a sentence.")
-                    with gr.Column(scale=1):
-                        num_song = gr.Number(value=1,minimum=1,maximum=5)
-
-
+                    image_prompt = gr.Text(label="Prompt",value="Describe the music in detail that better suits this picture in a sentence.")
+        
                 with gr.Row():
                     llava_num_token = gr.Slider(minimum=10,maximum=50,step=1,label="Prompt Length",value=30)
                     musicgen_num_token = gr.Slider(minimum=100,maximum=1000,step=10,label="Music Length",value=500)
+                    num_song = gr.Number(value=1,minimum=1,maximum=5)
+                    
                 with gr.Row():
                     genre_dropdown = gr.Dropdown(choices=setting['Genre'],max_choices=1,label="Genre",value="None")
                     mood_dropdown = gr.Dropdown(choices=setting['Mood'],max_choices=1,label="Mood",value="None")
@@ -81,13 +74,12 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
 
         with gr.Column() as col2:
-            output_text = gr.Textbox()
+            output_text = gr.Textbox(label="AI",interactive=False,placeholder="Upload image to get a custom music!")
 
             @gr.render(inputs=[num_song,audios],triggers=[audios.change],trigger_mode='once')
             def dynamic_audio_component_render(num_song,audios):
                 for i in range(num_song):
-                    print(audios[i])
-                    gr.Audio(value=(audios[i]),interactive=False,type="numpy")
+                    gr.Audio(value=(audios[i]),interactive=False,type="numpy",label=f"sample {i+1}")
                 
 
             generate_new_music_button = gr.Button("Generate New Song",visible=False)
@@ -163,6 +155,8 @@ def musicgen_inference(prompt, num_token, num_song):
 
 
 app = gr.mount_gradio_app(app,demo,'/')
+
+
 
 @app.get('/health')
 def health_check():
