@@ -12,10 +12,11 @@ import threading
 import yaml
 import json
 
-from inference import musicgen , llava
+from inference import Pipeline
 
 # FastAPI APP
 app = FastAPI()
+pipeline = Pipeline()
 
 # Credential
 load_dotenv()
@@ -128,7 +129,7 @@ def llava_inference(image_url,image_prompt,num_token):
         "prompt": image_prompt,
         "max_num_token": num_token
     }
-    return llava(**data)
+    return pipeline.llava(**data)
     
 
 def musicgen_inference(prompt, num_token):
@@ -137,7 +138,7 @@ def musicgen_inference(prompt, num_token):
         "prompt": prompt,
         "max_num_token": num_token
     }
-    return musicgen(**data)
+    return pipeline.musicgen(**data)
 
 
 app = gr.mount_gradio_app(app,demo,path="/")
