@@ -131,4 +131,4 @@ def musicgen_inference(prompt, num_token):
 
 
 if __name__ == "__main__":
-    demo.launch(share=True,server_name='0.0.0.0',server_port=os.environ['GRADIO_PORT'])
+    demo.launch(share=True,server_name='0.0.0.0',server_port=int(os.environ['GRADIO_PORT']))
