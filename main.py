@@ -30,7 +30,7 @@ with open(setting_file,'r') as file:
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
     image = gr.State()
-
+    audio_component_list = gr.State([])
 
     gr.Markdown(
         """
@@ -74,7 +74,6 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
         with gr.Column() as col2:
             output_text = gr.Textbox()
-            audio_component_list = []
             for i in range(setting['Audio']['max_audio']):
                 audio_component_list.append(gr.Audio(visible=False,type="numpy",interactive=False))
 
