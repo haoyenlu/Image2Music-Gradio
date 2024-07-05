@@ -30,7 +30,7 @@ with open(setting_file,'r') as file:
 with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as demo:
     
     image = gr.State()
-    audios = gr.State()
+    audios = gr.State([])
 
 
     gr.Markdown(
