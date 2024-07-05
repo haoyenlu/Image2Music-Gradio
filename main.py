@@ -57,7 +57,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
                     image_url_preview_button = gr.Button("Preview")
                     image_url_submit_button = gr.Button("Confirm")
 
-            with gr.Tab("Setting"):
+            with gr.Tab("Setting",elem_id="setting"):
                 with gr.Row():
                     image_prompt = gr.Text(label="Prompt",value="Describe the music in detail that better suits this picture in a sentence.",scale=3)
                     num_song = gr.Number(value=1,minimum=1,maximum=5,scale=1)
@@ -77,9 +77,9 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
         with gr.Column() as col2:
             output_text = gr.Textbox(label="AI",interactive=False,placeholder="Upload image to get a custom music!")
 
-            @gr.render(inputs=[num_song,audios],triggers=[audios.change],trigger_mode='once')
-            def dynamic_audio_component_render(num_song,audios):
-                for i in range(num_song):
+            @gr.render(inputs=[audios],triggers=[audios.change],trigger_mode='once')
+            def dynamic_audio_component_render(audios):
+                for i in range(len(num_song)):
                     gr.Audio(value=(audios[i]),interactive=False,type="numpy",label=f"sample {i+1}")
                 
 
