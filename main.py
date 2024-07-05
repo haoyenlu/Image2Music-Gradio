@@ -4,16 +4,17 @@ from dotenv import load_dotenv
 from PIL import Image
 import requests
 import os
-from pathlib import Path
-from fastapi.staticfiles import StaticFiles
 import threading
 import yaml
 import json
+import fastapi
+import uvicorn
 
 
 from inference import Pipeline
 
 # model pipeline
+app = fastapi.FastAPI()
 pipeline = Pipeline()
 
 # Credential
@@ -128,6 +129,14 @@ def musicgen_inference(prompt, num_token):
     }
     return pipeline.musicgen(**data)
 
+app = gr.mount_gradio_app(app,demo,'/gradio')
+
+@app.get('/health')
+def health_check():
+    return {"message":"Connect successfully!"}
 
 if __name__ == "__main__":
-    demo.launch(share=True,server_name='0.0.0.0',server_port=int(os.environ['GRADIO_PORT']))
+    config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
+    server = uvicorn.Server(config)
+    thread = threading.Thread(target=server.run)
+    thread.start()
