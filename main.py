@@ -56,10 +56,10 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
                     llava_num_token = gr.Slider(minimum=10,maximum=50,step=1,label="Prompt Length",value=30)
                     musicgen_num_token = gr.Slider(minimum=100,maximum=1000,step=10,label="Music Length",value=500)
                 with gr.Row():
-                    genre_dropdown = gr.Dropdown(choices=setting['Genre'],max_choices=1,label="Genre")
-                    mood_dropdown = gr.Dropdown(choices=setting['Mood'],max_choices=1,label="Mood")
+                    genre_dropdown = gr.Dropdown(choices=setting['Genre'],max_choices=1,label="Genre",value="None")
+                    mood_dropdown = gr.Dropdown(choices=setting['Mood'],max_choices=1,label="Mood",value="None")
 
-                music_genre = gr.Text(label="Custom Music Specification")
+                music_description = gr.Text(label="Custom Music Specification")
 
 
         with gr.Column() as col2:
@@ -70,13 +70,13 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
 
 
-    @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown],
+    @image_submit_button.click(inputs=[input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown],
                                outputs=[image,output_text,audio,generate_new_music_button])
-    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown):
+    def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
         if input_image is None:
             raise gr.Error('Please upload image first!')
 
-        return inference(input_image,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown)
+        return inference(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown)
 
 
     @image_url_preview_button.click(inputs=[input_image_url],outputs=[preview_image_box])
@@ -84,30 +84,34 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
         image = Image.open(requests.get(url,stream=True).raw)
         return gr.Image(visible=True,value=image,label="Preview",container=True)
     
-    def inference(image,image_prompt,llava_num_token,musicgen_num_token,music_genre, genre_dropdown, mood_dropdown):
+    def inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description, genre_dropdown, mood_dropdown):
         llava_result = llava_inference(image,image_prompt,llava_num_token)
-        musicgen_result = musicgen_inference(f"{llava_result},{music_genre},{genre_dropdown} in {mood_dropdown} mood", musicgen_num_token)
+
+        genre = "" if genre_dropdown == "None" else genre_dropdown
+        mood = mood_dropdown if mood_dropdown != "None" else mood_dropdown
+        musicgen_prompt = f"{llava_result},{music_description},{genre},{mood}"
+
+        musicgen_result = musicgen_inference(f"{llava_result},{music_description},{genre_dropdown} in {mood_dropdown} mood", musicgen_num_token)
         generate_new_music_button = gr.Button("Generate New Song",visible=True)
         return image,llava_result, (int(musicgen_result['sample_rate']), np.array(musicgen_result['audio'][0]).astype(np.float32)) , generate_new_music_button
 
-    @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown],
+    @image_url_submit_button.click(inputs=[input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown],
                                    outputs=[image,output_text,audio,generate_new_music_button])
-    def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown):
+    def handle_image_url(input_image_url,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
         if input_image_url == "":
             raise gr.Error("Please Enter the URL of the image!")
         
         image = Image.open(requests.get(input_image_url,stream=True).raw)
-        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown)
+        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown)
 
-    @generate_new_music_button.click(inputs=[image,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown],
+    @generate_new_music_button.click(inputs=[image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown],
                                      outputs=[image,output_text,audio,generate_new_music_button])
-    def handle_generate_new_song(image,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown):
-        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_genre,genre_dropdown,mood_dropdown)
+    def handle_generate_new_song(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown):
+        return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown)
     
 
 
 def llava_inference(image,image_prompt,num_token):
-    # url = f"{os.environ['EC2_URL']}:{os.environ['MODEL_PORT']}/llava"
     data = {
         "image":image,
         "prompt": image_prompt,
@@ -117,17 +121,11 @@ def llava_inference(image,image_prompt,num_token):
     
 
 def musicgen_inference(prompt, num_token):
-    # url = f"{os.environ['EC2_URL']}:{os.environ['MODEL_PORT']}/musicgen"
     data = {
         "prompt": prompt,
         "max_num_token": num_token
     }
     return pipeline.musicgen(**data)
-
-
-# @app.get('/health')
-# def health_check():
-#     return {"message":"Connect successfully!"}
 
 
 if __name__ == "__main__":
