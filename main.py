@@ -16,7 +16,7 @@ from inference import Pipeline
 # model pipeline
 app = fastapi.FastAPI()
 pipeline = Pipeline()
-# pipeline.load_model()
+pipeline.load_model()
 
 # Credential
 load_dotenv()
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     
     config = uvicorn.Config(app=app,host="0.0.0.0",port=int(os.environ['GRADIO_PORT']))
     server = uvicorn.Server(config)
-    server.run()
+    # server.run()
 
-    # thread = threading.Thread(target=server.run)
-    # thread.start()
+    thread = threading.Thread(target=server.run)
+    thread.start()
