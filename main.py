@@ -78,8 +78,10 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
             @gr.render(inputs=[num_song,audio_component_list])
             def render_audio_components(num,audio_component_list):
+                audio_list = []
                 for i in range(num):
-                    audio_component_list.append(gr.Audio(label=f"sample {i}",type="numpy",interactive=False))
+                    audio_list.append(gr.Audio(label=f"sample {i}",type="numpy",interactive=False))
+                audio_component_list = audio_list
 
             generate_new_music_button = gr.Button("Generate New Song",visible=False)
 
@@ -111,10 +113,8 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
 
         sample_rate =  int(musicgen_result['sample_rate'])
         audios = musicgen_result['audio']
-        print(audios.shape)
-        print(len(audio_list))
         for i in range(num_song):
-            audio_list[i] = gr.Audio(value=(sample_rate,np.array(audios[i,0,:]).astype(np.float32)),interactive=False,type="numpy")
+            audio_list[i].update(value=(sample_rate,np.array(audios[i,0,:]).astype(np.float32)))
 
         return image,llava_result, audio_list , generate_new_music_button
 
