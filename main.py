@@ -15,7 +15,7 @@ from inference import Pipeline
 # model pipeline
 app = fastapi.FastAPI()
 pipeline = Pipeline()
-# pipeline.load_model()
+pipeline.load_model()
 
 # Credential
 load_dotenv()
