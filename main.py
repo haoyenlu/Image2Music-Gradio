@@ -15,7 +15,7 @@ from inference import Pipeline
 # model pipeline
 app = fastapi.FastAPI()
 pipeline = Pipeline()
-pipeline.load_model()
+# pipeline.load_model()
 
 # Credential
 load_dotenv()
@@ -92,6 +92,8 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
     def handle_image_upload(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song):
         if input_image is None:
             raise gr.Error('Please upload image first!')
+        
+        gr.Info("Generating Songs!")
 
         return inference(input_image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
 
@@ -126,6 +128,7 @@ with gr.Blocks(theme=gr.themes.Base()).queue(default_concurrency_limit=10) as de
         if input_image_url == "":
             raise gr.Error("Please Enter the URL of the image!")
         
+        gr.Info("Generating Songs!")
         image = Image.open(requests.get(input_image_url,stream=True).raw)
         return inference(image,image_prompt,llava_num_token,musicgen_num_token,music_description,genre_dropdown,mood_dropdown,num_song)
 
